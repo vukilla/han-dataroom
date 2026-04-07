@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const APP_HOST = process.env.NEXT_PUBLIC_APP_BASE_HOST || "dataroom.humanoidnetwork.org";
+const WEBHOOK_HOST = process.env.NEXT_PUBLIC_WEBHOOK_BASE_HOST || "dataroom.humanoidnetwork.org";
 const nextConfig = {
   reactStrictMode: true,
   pageExtensions: ["js", "jsx", "ts", "tsx", "mdx"],
@@ -22,7 +24,7 @@ const nextConfig = {
         has: [
           {
             type: "host",
-            value: process.env.NEXT_PUBLIC_APP_BASE_HOST,
+            value: APP_HOST,
           },
         ],
       },
@@ -133,7 +135,7 @@ const nextConfig = {
         has: [
           {
             type: "host",
-            value: process.env.NEXT_PUBLIC_WEBHOOK_BASE_HOST,
+            value: WEBHOOK_HOST,
           },
         ],
         headers: [
