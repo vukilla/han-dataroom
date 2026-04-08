@@ -34,7 +34,7 @@ export const sendVerificationRequestEmail = async (params: {
   // Generate verification code
   const code = generateVerificationCode();
 
-  // Store the login data in Redis with 15-minute TTL
+  // Store the login data in Redis with 15-minute TTL (if Redis is available)
   const loginCodeData: LoginCodeData = {
     email,
     code,
@@ -42,12 +42,15 @@ export const sendVerificationRequestEmail = async (params: {
     createdAt: Date.now(),
   };
 
-  // Store with email:code as key for lookup (must complete before redirecting)
-  await redis.set(
-    `${LOGIN_CODE_EMAIL_PREFIX}${email.toLowerCase()}:${code}`,
-    JSON.stringify(loginCodeData),
-    { ex: TOKEN_EXPIRATION_SECONDS },
-  );
+  try {
+    await redis.set(
+      `${LOGIN_CODE_EMAIL_PREFIX}${email.toLowerCase()}:${code}`,
+      JSON.stringify(loginCodeData),
+      { ex: TOKEN_EXPIRATION_SECONDS },
+    );
+  } catch (e) {
+    console.warn("Redis not available for login code, using magic link only");
+  }
 
   const emailTemplate = VerificationCodeEmail({
     email,
