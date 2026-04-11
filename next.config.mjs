@@ -37,6 +37,12 @@ const nextConfig = {
         destination: "/settings/general",
         permanent: false,
       },
+      {
+        // Canonical URL is /investor — redirect raw link ID there
+        source: "/view/cmnut6yzm0003vi3y14jpdtre",
+        destination: "/investor",
+        permanent: false,
+      },
     ];
   },
   async headers() {
