@@ -16,17 +16,6 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: "/",
-        destination: "/dashboard",
-        permanent: false,
-        has: [
-          {
-            type: "host",
-            value: APP_HOST,
-          },
-        ],
-      },
-      {
         // temporary redirect set on 2025-10-22
         source: "/view/cmdn06aw00001ju04jgsf8h4f",
         destination: "/view/cmh0uiv6t001mjm04sk10ecc8",
@@ -38,9 +27,14 @@ const nextConfig = {
         permanent: false,
       },
       {
-        // Canonical URL is /investor — redirect raw link ID there
+        // Any direct /view/ or /investor hit redirects to root
         source: "/view/cmnut6yzm0003vi3y14jpdtre",
-        destination: "/investor",
+        destination: "/",
+        permanent: false,
+      },
+      {
+        source: "/investor",
+        destination: "/",
         permanent: false,
       },
     ];
@@ -170,14 +164,22 @@ const nextConfig = {
     ];
   },
   async rewrites() {
-    return [
-      {
-        // Clean investor data room URL — rewrite (not redirect) so
-        // the browser address bar keeps showing /investor
-        source: "/investor",
-        destination: "/view/cmnut6yzm0003vi3y14jpdtre",
-      },
-    ];
+    return {
+      // beforeFiles rewrites run before filesystem routes (pages/index)
+      beforeFiles: [
+        {
+          // Root domain serves the investor dataroom directly
+          source: "/",
+          destination: "/view/cmnut6yzm0003vi3y14jpdtre",
+          has: [
+            {
+              type: "host",
+              value: APP_HOST,
+            },
+          ],
+        },
+      ],
+    };
   },
   experimental: {
     outputFileTracingIncludes: {
