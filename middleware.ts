@@ -66,6 +66,13 @@ export default async function middleware(req: NextRequest, ev: NextFetchEvent) {
     return DomainMiddleware(req);
   }
 
+  // Root path on the app host is rewritten to the dataroom view — let it through
+  const appHost =
+    process.env.NEXT_PUBLIC_APP_BASE_HOST || "dataroom.humanoidnetwork.org";
+  if (path === "/" && host === appHost) {
+    return NextResponse.next();
+  }
+
   // Handle standard papermark.com paths
   if (
     !path.startsWith("/view/") &&
