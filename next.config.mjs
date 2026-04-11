@@ -152,24 +152,8 @@ const nextConfig = {
       },
     ];
   },
-  async rewrites() {
-    return {
-      // beforeFiles rewrites run before filesystem routes (pages/index)
-      beforeFiles: [
-        {
-          // Root domain serves the investor dataroom directly
-          source: "/",
-          destination: "/view/cmnut6yzm0003vi3y14jpdtre",
-          has: [
-            {
-              type: "host",
-              value: APP_HOST,
-            },
-          ],
-        },
-      ],
-    };
-  },
+  // Root URL rewrite is handled in middleware.ts (more reliable than
+  // beforeFiles rewrites which run after middleware)
   experimental: {
     outputFileTracingIncludes: {
       "/api/mupdf/*": ["./node_modules/mupdf/dist/*.wasm"],
