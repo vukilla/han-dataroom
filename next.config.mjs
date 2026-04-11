@@ -33,6 +33,12 @@ const nextConfig = {
         permanent: false,
       },
       {
+        // Clean investor data room URL
+        source: "/investor",
+        destination: "/view/cmnut6yzm0003vi3y14jpdtre",
+        permanent: false,
+      },
+      {
         source: "/settings",
         destination: "/settings/general",
         permanent: false,
