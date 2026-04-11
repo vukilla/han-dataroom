@@ -33,12 +33,6 @@ const nextConfig = {
         permanent: false,
       },
       {
-        // Clean investor data room URL
-        source: "/investor",
-        destination: "/view/cmnut6yzm0003vi3y14jpdtre",
-        permanent: false,
-      },
-      {
         source: "/settings",
         destination: "/settings/general",
         permanent: false,
@@ -166,6 +160,16 @@ const nextConfig = {
             value: "noindex",
           },
         ],
+      },
+    ];
+  },
+  async rewrites() {
+    return [
+      {
+        // Clean investor data room URL — rewrite (not redirect) so
+        // the browser address bar keeps showing /investor
+        source: "/investor",
+        destination: "/view/cmnut6yzm0003vi3y14jpdtre",
       },
     ];
   },
