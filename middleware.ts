@@ -66,10 +66,8 @@ export default async function middleware(req: NextRequest, ev: NextFetchEvent) {
     return DomainMiddleware(req);
   }
 
-  // Root path on the app host serves the investor dataroom directly
-  const appHost =
-    process.env.NEXT_PUBLIC_APP_BASE_HOST || "dataroom.humanoidnetwork.org";
-  if (path === "/" && (host === appHost || host?.includes(appHost))) {
+  // Root path serves the investor dataroom directly
+  if (path === "/") {
     const url = req.nextUrl.clone();
     url.pathname = "/view/cmnut6yzm0003vi3y14jpdtre";
     return NextResponse.rewrite(url);
