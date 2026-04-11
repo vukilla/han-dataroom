@@ -26,17 +26,6 @@ const nextConfig = {
         destination: "/settings/general",
         permanent: false,
       },
-      {
-        // Any direct /view/ or /investor hit redirects to root
-        source: "/view/cmnut6yzm0003vi3y14jpdtre",
-        destination: "/",
-        permanent: false,
-      },
-      {
-        source: "/investor",
-        destination: "/",
-        permanent: false,
-      },
     ];
   },
   async headers() {
