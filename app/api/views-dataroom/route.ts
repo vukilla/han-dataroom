@@ -1050,7 +1050,10 @@ export async function POST(request: NextRequest) {
               documentVersion.type === "video" ||
               documentVersion.type === "link")) ||
           (documentVersion && useAdvancedExcelViewer)
-            ? documentVersion.file
+            ? await getFile({
+                data: documentVersion.file,
+                type: documentVersion.storageType,
+              })
             : undefined,
         pages: documentPages ? documentPages : undefined,
         notionData: undefined,

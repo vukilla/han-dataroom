@@ -78,8 +78,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate dataroom session for dataroom document views
-    if (view.dataroomId && view.linkId) {
+    // Validate dataroom session for dataroom document views (requires Redis)
+    if (
+      view.dataroomId &&
+      view.linkId &&
+      process.env.UPSTASH_REDIS_REST_URL
+    ) {
       const session = await verifyDataroomSession(
         request,
         view.linkId,
