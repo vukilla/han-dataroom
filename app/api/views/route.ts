@@ -254,7 +254,13 @@ export async function POST(request: NextRequest) {
       if (globalBlockCheck.isBlocked) {
         waitUntil(reportDeniedAccessAttempt(link, email, "global"));
 
-        return NextResponse.json({ message: "Access denied" }, { status: 403 });
+        return NextResponse.json(
+          {
+            message:
+              "Please use a company email address. Personal email domains (Gmail, Outlook, iCloud, Yahoo, Hotmail, ProtonMail, etc.) are not permitted.",
+          },
+          { status: 403 },
+        );
       }
 
       // Build combined allow list from individual emails + visitor groups
@@ -295,7 +301,10 @@ export async function POST(request: NextRequest) {
           waitUntil(reportDeniedAccessAttempt(link, email, "deny"));
 
           return NextResponse.json(
-            { message: "Unauthorized access" },
+            {
+              message:
+                "Please use a company email address. Personal email domains (Gmail, Outlook, iCloud, Yahoo, Hotmail, ProtonMail, etc.) are not permitted.",
+            },
             { status: 403 },
           );
         }
