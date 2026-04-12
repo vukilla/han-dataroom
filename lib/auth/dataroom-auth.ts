@@ -180,8 +180,8 @@ async function verifyDataroomSession(
     }
 
     return sessionData;
-  } catch (error) {
-    await redis.del(`dataroom_session:${sessionToken}`);
+  } catch {
+    // Redis or session parsing failed — treat as no session
     return null;
   }
 }
