@@ -893,7 +893,9 @@ export async function POST(request: NextRequest) {
       // otherwise, return file from document version
       let documentPages, documentVersion;
       let sheetData;
-      const INITIAL_PAGES_TO_LOAD = 10;
+      // Load all pages upfront — lazy-loading requires Redis sessions
+      // which are not configured on this deployment
+      const INITIAL_PAGES_TO_LOAD = 100;
 
       if (hasPages) {
         // get pages from document version
