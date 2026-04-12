@@ -18,11 +18,15 @@ export const getFile = async ({
 }: GetFileOptions): Promise<string> => {
   const url = await match(type)
     .with(DocumentStorageType.VERCEL_BLOB, () => {
+      // Always generate signed URLs for private blob stores
+      // Raw private blob URLs return 403 to browsers
+      if (data.includes(".private.blob.vercel-storage.com")) {
+        return getDownloadUrl(data);
+      }
       if (isDownload) {
         return getDownloadUrl(data);
-      } else {
-        return data;
       }
+      return data;
     })
     .with(DocumentStorageType.S3_PATH, async () =>
       getFileFromS3(data, expiresIn),
