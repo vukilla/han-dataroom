@@ -18,10 +18,10 @@ export const getFile = async ({
 }: GetFileOptions): Promise<string> => {
   const url = await match(type)
     .with(DocumentStorageType.VERCEL_BLOB, () => {
-      // Always generate signed URLs for private blob stores
-      // Raw private blob URLs return 403 to browsers
+      // Private blob URLs need server-side proxying — browsers can't access them directly
       if (data.includes(".private.blob.vercel-storage.com")) {
-        return getDownloadUrl(data);
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
+        return `${baseUrl}/api/file/blob-proxy?url=${encodeURIComponent(data)}`;
       }
       if (isDownload) {
         return getDownloadUrl(data);
