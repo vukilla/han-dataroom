@@ -363,7 +363,10 @@ export async function POST(request: NextRequest) {
           waitUntil(reportDeniedAccessAttempt(link, email, "deny"));
 
           return NextResponse.json(
-            { message: "Unauthorized access" },
+            {
+              message:
+                "Please use a company email address. Personal email domains (Gmail, Outlook, iCloud, Yahoo, Hotmail, ProtonMail, etc.) are not permitted.",
+            },
             { status: 403 },
           );
         }
