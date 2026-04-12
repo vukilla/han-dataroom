@@ -765,19 +765,28 @@ export async function POST(request: NextRequest) {
         const response = NextResponse.json(returnObject, { status: 200 });
 
         // Create a dataroom session token if a dataroom session doesn't exist yet
+        // Wrapped in try-catch: session creation uses Redis which may not be configured
         if (!dataroomSession && !isPreview) {
-          const fingerprint = generateSessionFingerprint(
-            collectFingerprintHeaders(request.headers),
-          );
-          const newDataroomSession = await createDataroomSession(
-            link.dataroomId!,
-            linkId,
-            newDataroomView?.id!,
-            ipAddress(request) ?? LOCALHOST_IP,
-            isEmailVerified,
-            viewer?.id,
-            fingerprint,
-          );
+          let newDataroomSession: {
+            token: string;
+            expiresAt: number;
+          } | null = null;
+          try {
+            const fingerprint = generateSessionFingerprint(
+              collectFingerprintHeaders(request.headers),
+            );
+            newDataroomSession = await createDataroomSession(
+              link.dataroomId!,
+              linkId,
+              newDataroomView?.id!,
+              ipAddress(request) ?? LOCALHOST_IP,
+              isEmailVerified,
+              viewer?.id,
+              fingerprint,
+            );
+          } catch (sessionError) {
+            console.warn("Failed to create dataroom session:", sessionError);
+          }
 
           let basePath = `/view/${linkId}`;
           const cookieId = `pm_drs_${linkId}`;
@@ -788,17 +797,19 @@ export async function POST(request: NextRequest) {
             flagCookieId = `pm_drs_flag_${link.slug}`;
           }
 
-          response.cookies.set(cookieId, newDataroomSession?.token, {
-            path: "/",
-            expires: new Date(newDataroomSession?.expiresAt),
-            httpOnly: true,
-            sameSite: "strict",
-          });
-          response.cookies.set(flagCookieId, "true", {
-            path: basePath,
-            expires: new Date(newDataroomSession?.expiresAt),
-            sameSite: "strict",
-          });
+          if (newDataroomSession) {
+            response.cookies.set(cookieId, newDataroomSession.token, {
+              path: "/",
+              expires: new Date(newDataroomSession.expiresAt),
+              httpOnly: true,
+              sameSite: "strict",
+            });
+            response.cookies.set(flagCookieId, "true", {
+              path: basePath,
+              expires: new Date(newDataroomSession.expiresAt),
+              sameSite: "strict",
+            });
+          }
         }
 
         return response;
@@ -1098,38 +1109,48 @@ export async function POST(request: NextRequest) {
 
       // Create a dataroom session token if a dataroom session doesn't exist yet
       if (!dataroomSession && !isPreview) {
-        const fingerprint = generateSessionFingerprint(
-          collectFingerprintHeaders(request.headers),
-        );
-        const newDataroomSession = await createDataroomSession(
-          link.dataroomId!,
-          linkId,
-          dataroomView?.id!,
-          ipAddress(request) ?? LOCALHOST_IP,
-          isEmailVerified,
-          viewer?.id,
-          fingerprint,
-        );
-
-        let basePath = `/view/${linkId}`;
-        const cookieId = `pm_drs_${linkId}`;
-        let flagCookieId = `pm_drs_flag_${linkId}`;
-        if (link.domainId) {
-          basePath = `/${link.slug}`;
-          flagCookieId = `pm_drs_flag_${link.slug}`;
+        let newDataroomSession: {
+          token: string;
+          expiresAt: number;
+        } | null = null;
+        try {
+          const fingerprint = generateSessionFingerprint(
+            collectFingerprintHeaders(request.headers),
+          );
+          newDataroomSession = await createDataroomSession(
+            link.dataroomId!,
+            linkId,
+            dataroomView?.id!,
+            ipAddress(request) ?? LOCALHOST_IP,
+            isEmailVerified,
+            viewer?.id,
+            fingerprint,
+          );
+        } catch (sessionError) {
+          console.warn("Failed to create dataroom session:", sessionError);
         }
 
-        response.cookies.set(cookieId, newDataroomSession?.token, {
-          path: "/",
-          expires: new Date(newDataroomSession?.expiresAt),
-          httpOnly: true,
-          sameSite: "strict",
-        });
-        response.cookies.set(flagCookieId, "true", {
-          path: basePath,
-          expires: new Date(newDataroomSession?.expiresAt),
-          sameSite: "strict",
-        });
+        if (newDataroomSession) {
+          let basePath = `/view/${linkId}`;
+          const cookieId = `pm_drs_${linkId}`;
+          let flagCookieId = `pm_drs_flag_${linkId}`;
+          if (link.domainId) {
+            basePath = `/${link.slug}`;
+            flagCookieId = `pm_drs_flag_${link.slug}`;
+          }
+
+          response.cookies.set(cookieId, newDataroomSession.token, {
+            path: "/",
+            expires: new Date(newDataroomSession.expiresAt),
+            httpOnly: true,
+            sameSite: "strict",
+          });
+          response.cookies.set(flagCookieId, "true", {
+            path: basePath,
+            expires: new Date(newDataroomSession.expiresAt),
+            sameSite: "strict",
+          });
+        }
       }
 
       return response;

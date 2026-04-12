@@ -141,13 +141,12 @@ async function verifyDataroomSession(
 ): Promise<DataroomSession | null> {
   if (!dataroomId) return null;
 
-  const sessionToken = cookies().get(`pm_drs_${linkId}`)?.value;
-  if (!sessionToken) return null;
-
-  const session = await redis.get(`dataroom_session:${sessionToken}`);
-  if (!session) return null;
-
   try {
+    const sessionToken = cookies().get(`pm_drs_${linkId}`)?.value;
+    if (!sessionToken) return null;
+
+    const session = await redis.get(`dataroom_session:${sessionToken}`);
+    if (!session) return null;
     const sessionData = DataroomSessionSchema.parse(session);
 
     if (sessionData.expiresAt < Date.now()) {
